@@ -4,29 +4,25 @@ import Audio from '../../web_audio/Audio'
 
 export const Key = (props) => {
 
+  let oscillatorGainNode = null;
+  let oscillatorNode = null;
 
-  const [masterGainValue, setMasterGainValue] = useState(0)
+  const initializeOscillatorGain = () => {
 
-  const initializeMasterGain = () => {
-    Audio.masterGainNode.gain.setValueAtTime(.2, Audio.context.currentTime)
-    Audio.masterGainNode.connect(Audio.context.destination)
-    setMasterGainValue(.5)
-
-    const oscillatorGainNode = Audio.context.createGain()
-    oscillatorGainNode.gain.setValueAtTime(.1, Audio.context.currentTime)
+    oscillatorGainNode = Audio.context.createGain()
+    oscillatorGainNode.gain.setValueAtTime(0, Audio.context.currentTime)
     oscillatorGainNode.connect(Audio.masterGainNode)
 
-    const oscillatorNode = Audio.context.createOscillator()
+    oscillatorNode = Audio.context.createOscillator()
     oscillatorNode.type = 'sine'
     oscillatorNode.frequency.setValueAtTime(props.frequency, Audio.context.currentTime)
     oscillatorNode.connect(oscillatorGainNode)
     oscillatorNode.start()
 
+    console.log("initial oscillatorNode", oscillatorNode);
   }
 
-  useEffect(initializeMasterGain, [props.frequency])
-
-
+  useEffect(initializeOscillatorGain, [props.frequency])
 
   const KeyStyled = styled.div`
     width: 80px;
@@ -38,11 +34,13 @@ export const Key = (props) => {
 
   const play = () => {
     console.log('key:', props.note, props.frequency, props.colorKey)
-    Audio.masterGainNode.gain.setTargetAtTime(masterGainValue, Audio.context.currentTime, 0.001)
+    console.log("play oscillatorNode", oscillatorNode);
+    console.log("play oscillatorGainNode", oscillatorGainNode);
+    oscillatorGainNode.gain.setTargetAtTime(0.6, Audio.context.currentTime, 0.001)
   }
 
   const pause = () => {
-    Audio.masterGainNode.gain.setTargetAtTime(0, Audio.context.currentTime, 0.001)
+    oscillatorGainNode.gain.setTargetAtTime(0, Audio.context.currentTime, 0.001)
   }
 
   return (
