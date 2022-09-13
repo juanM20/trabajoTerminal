@@ -4,8 +4,8 @@ import Audio from '../../web_audio/Audio'
 
 export const Key = (props) => {
 
-  let oscillatorGainNode = null;
-  let oscillatorNode = null;
+  let oscillatorGainNode;
+  let oscillatorNode;
 
   const initializeOscillatorGain = () => {
 
@@ -19,7 +19,7 @@ export const Key = (props) => {
     oscillatorNode.connect(oscillatorGainNode)
     oscillatorNode.start()
 
-    console.log("initial oscillatorNode", oscillatorNode);
+    console.log("initial oscillatorNode", oscillatorNode)
   }
 
   useEffect(initializeOscillatorGain, [props.frequency])
@@ -34,8 +34,8 @@ export const Key = (props) => {
 
   const play = () => {
     console.log('key:', props.note, props.frequency, props.colorKey)
-    console.log("play oscillatorNode", oscillatorNode);
-    console.log("play oscillatorGainNode", oscillatorGainNode);
+    console.log("play oscillatorNode", oscillatorNode)
+    console.log("play oscillatorGainNode", oscillatorGainNode)
     oscillatorGainNode.gain.setTargetAtTime(0.6, Audio.context.currentTime, 0.001)
   }
 
