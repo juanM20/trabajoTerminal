@@ -1,50 +1,67 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 import Audio from '../../web_audio/Audio'
 
+
+const KeyStyle = styled.div`
+  width: 80px;
+  height: 260px;
+  border: 1px solid black;
+`
+
+
 export const Key = (props) => {
 
-  let oscillatorGainNode;
-  let oscillatorNode;
+  const [firstPlay, setFirstPlay] = useState(true);
+
+  const oscillatorGainNode = useRef()
+  const oscillatorNode = useRef()
 
   const initializeOscillatorGain = () => {
 
-    oscillatorGainNode = Audio.context.createGain()
-    oscillatorGainNode.gain.setValueAtTime(0, Audio.context.currentTime)
-    oscillatorGainNode.connect(Audio.masterGainNode)
+    oscillatorGainNode.current = Audio.context.createGain()
+    oscillatorGainNode.current.gain.setValueAtTime(0, Audio.context.currentTime)
+    oscillatorGainNode.current.connect(Audio.masterGainNode)
 
-    oscillatorNode = Audio.context.createOscillator()
-    oscillatorNode.type = 'sine'
-    oscillatorNode.frequency.setValueAtTime(props.frequency, Audio.context.currentTime)
-    oscillatorNode.connect(oscillatorGainNode)
-    oscillatorNode.start()
+    oscillatorNode.current = Audio.context.createOscillator()
+    oscillatorNode.current.type = 'sine'
+    oscillatorNode.current.frequency.setValueAtTime(props.frequency, Audio.context.currentTime)
+    oscillatorNode.current.connect(oscillatorGainNode.current)
 
-    console.log("initial oscillatorNode", oscillatorNode)
+    console.log("initial oscillatorNode", oscillatorNode.current)
   }
 
   useEffect(initializeOscillatorGain, [props.frequency])
 
-  const KeyStyled = styled.div`
-    width: 80px;
-    height: 260px;
-    border: 1px solid black;
+  const KeyStyled = styled(KeyStyle)`
     background-color: ${props.colorKey};
     color: ${props.colorKey === 'white' ? 'black' : 'white'};
   `
 
   const play = () => {
     console.log('key:', props.note, props.frequency, props.colorKey)
-    console.log("play oscillatorNode", oscillatorNode)
-    console.log("play oscillatorGainNode", oscillatorGainNode)
-    oscillatorGainNode.gain.setTargetAtTime(0.6, Audio.context.currentTime, 0.001)
+    // console.log("play oscillatorNode", oscillatorNode.current)
+    // console.log("play oscillatorGainNode", oscillatorGainNode.current)
+
+    if (firstPlay) {
+      oscillatorNode.current.start()
+      setFirstPlay(false)
+    }
+
+    oscillatorGainNode.current.gain.setTargetAtTime(0.7, Audio.context.currentTime, 0.001)
+
   }
 
   const pause = () => {
-    oscillatorGainNode.gain.setTargetAtTime(0, Audio.context.currentTime, 0.001)
+    oscillatorGainNode.current.gain.setTargetAtTime(0, Audio.context.currentTime, 0.001)
+  }
+
+  const handleKeyDown = (event) => {
+    console.log('User pressed:', event.key)
   }
 
   return (
-    <div className='key' onMouseDown={play} onMouseUp={pause}>
+    <div className='key' tabIndex={-1} onMouseDown={play} onMouseUp={pause} onKeyDown={handleKeyDown}>
       <KeyStyled>{props.note}</KeyStyled>
     </div>
   )

@@ -24,8 +24,8 @@ export const Keyboard = () => {
 
   return (
     <div className='keyboard'>
-      {frequencies.map((freq) => {
-        return <Key note={freq.note} frequency={freq.freq} colorKey={freq.color} />
+      {frequencies.map((freq, index) => {
+        return <Key key={index} note={freq.note} frequency={freq.freq} colorKey={freq.color} />
       })}
     </div>
   )
